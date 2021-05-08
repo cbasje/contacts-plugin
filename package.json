@@ -17,10 +17,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/csrdelft/csrdelft.nl.git"
+    "url": "git+https://github.com/cbasje/contacts-plugin.git"
   },
   "bugs": {
-    "url": "https://github.com/csrdelft/csrdelft.nl/issues"
+    "url": "https://github.com/cbasje/contacts-plugin/issues"
   },
   "keywords": [
     "capacitor",
