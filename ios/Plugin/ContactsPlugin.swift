@@ -2,6 +2,7 @@ import Foundation
 import Capacitor
 import Contacts
 import ContactsUI
+import UIKit
 
 /**
  * Please read the Capacitor iOS Plugin Development Guide
@@ -9,81 +10,75 @@ import ContactsUI
  */
 @objc(ContactsPlugin)
 public class ContactsPlugin: CAPPlugin {
-    private let implementation = Contacts()
-
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.resolve([
-            "value": implementation.echo(value)
-        ])
-    }
-
-    /**
-     * Tutorial: https://www.raywenderlich.com/2547730-contacts-framework-tutorial-for-ios
-     */
-    @objc func addContact(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        
-        guard
-          let friend = friend,
-          let phoneNumberText = phoneTextField.text
-          else { return }
-        
-        let store = CNContactStore()
-        
-        let phoneNumberValue = CNPhoneNumber(stringValue: phoneNumberText)
-        let saveRequest = CNSaveRequest()
-
-        if let storedContact = friend.storedContact,
-           let phoneNumberToEdit = storedContact.phoneNumbers.first(where: { $0 == friend.phoneNumberField }),
-           let index = storedContact.phoneNumbers.firstIndex(of: phoneNumberToEdit) {
-            
-            let newPhoneNumberField = phoneNumberToEdit.settingValue(phoneNumberValue)
-            storedContact.phoneNumbers.remove(at: index)
-            storedContact.phoneNumbers.insert(newPhoneNumberField, at: index)
-            friend.phoneNumberField = newPhoneNumberField
-
-            saveRequest.update(storedContact)
-            friend.storedContact = nil
-            
-        } else if let unsavedContact = friend.contactValue.mutableCopy() as? CNMutableContact {
-            
-            let phoneNumberField = CNLabeledValue(label: CNLabelPhoneNumberMain,
-                                                  value: phoneNumberValue)
-            unsavedContact.phoneNumbers = [phoneNumberField]
-            friend.phoneNumberField = phoneNumberField
-            
-            saveRequest.add(unsavedContact, toContainerWithIdentifier: nil)
-        }
-        
-        do {
-            try store.execute(saveRequest)
-            resolve
-        } catch {
-            print(error)
-            failure
-        }
-    }
+    private var call: CAPPluginCall?
+    private var store = CNContactStore()
     
     /*
      * More: https://www.youtube.com/watch?v=5kBtuQAFuGk
      */
-    @objc func addToExisting() {
-        let value = call.getString("value") ?? ""
-
-        let newContact = CNContact()
-        let vc = CNContactViewController(forNewContact: newContact)
-        vc.delegate = self // this delegate CNContactViewControllerDelegate
-        // self.navigationController?.pushViewController(vc, animated: true)
-        self.present(UINavigationController(rootViewController: vc), animated:true)
+    @objc func addToExisting(_ call: CAPPluginCall) {
+        self.call = call
+        
+        DispatchQueue.main.async {
+            let pickerVC = CNContactPickerViewController()
+            pickerVC.delegate = self
+            
+            guard let bridge = self.bridge else { return }
+            
+            bridge.viewController?.present(pickerVC, animated: true, completion: nil)
+        }
+    }
+    
+    @objc func createNew(_ call: CAPPluginCall) {
+        self.call = call
+        
+        let contactData = Contact(call: call)
+        let newContact = CNMutableContact()
+        
+        newContact.setNameFields(from: contactData)
+        
+        newContact.setNote(from: contactData)
+        
+        // Add all the phone numbers
+        newContact.addPhoneNumbers(from: contactData)
+        
+        // Add all the email addresses
+        newContact.addEmailAdresses(from: contactData)
+        
+        // Set addresses
+        newContact.addPostalAdresses(from: contactData)
+        
+        // Add all the urls
+        newContact.addUrls(from: contactData)
+        
+//        FIXME
+//        newContact.setBirthday(from: contactData)
+        
+        saveContact(newContact, saveOption: .createNew)
     }
 
-    @objc func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
-        self.dismiss(animated: true, completion: nil)
+    /*
+     * Save with contactVC: https://stackoverflow.com/questions/58749575/how-to-add-new-contact-into-contacts?noredirect=1&lq=1
+     */
+    public func saveContact(_ contact: CNMutableContact, saveOption: ContactSaveOptions) {
+        let contactVC: CNContactViewController
+        
+        contactVC = CNContactViewController(forNewContact: contact)
+        
+        contactVC.delegate = self // this delegate CNContactViewControllerDelegate
+        // self.navigationController?.pushViewController(vc, animated: true)
+        // self.present(UINavigationController(rootViewController: vc), animated:true)
+        
+        DispatchQueue.main.async {
+            guard let bridge = self.bridge else { return }
+            
+            bridge.viewController?.present(UINavigationController(rootViewController: contactVC), animated: true, completion: nil)
+        }
     }
     
     @objc func getContacts(_ call: CAPPluginCall) {
-        let contactStore = CNContactStore()
+        addToExisting(call)
+        
         var contacts = [Any]()
         let keys = [
                 CNContactFormatter.descriptorForRequiredKeys(for: .fullName),
@@ -92,7 +87,7 @@ public class ContactsPlugin: CAPPlugin {
                 ] as [Any]
         let request = CNContactFetchRequest(keysToFetch: keys as! [CNKeyDescriptor])
         
-        contactStore.requestAccess(for: .contacts) { (granted, error) in
+        store.requestAccess(for: .contacts) { (granted, error) in
             if let error = error {
                 print("Failed to request access", error)
                 call.reject("Access denied")
@@ -100,7 +95,7 @@ public class ContactsPlugin: CAPPlugin {
             }
             if granted {
                 do {
-                    try contactStore.enumerateContacts(with: request) { (contact, _) in
+                    try self.store.enumerateContacts(with: request) { (contact, _) in
                         contacts.append([
                             "firstName": contact.givenName,
                             "lastName": contact.familyName,
@@ -120,5 +115,119 @@ public class ContactsPlugin: CAPPlugin {
                 call.reject("Access denied")
             }
         }
+    }
+    
+    /**
+     * Save without confirmation
+     * Tutorial: https://www.raywenderlich.com/2547730-contacts-framework-tutorial-for-ios
+     */
+    @objc func addContact(_ call: CAPPluginCall) {
+//        let value = call.getString("value") ?? ""
+//
+//        guard
+//          let friend = friend,
+//          let phoneNumberText = phoneTextField.text
+//          else { return }
+//
+//        let store = CNContactStore()
+//
+//        let phoneNumberValue = CNPhoneNumber(stringValue: phoneNumberText)
+//        let saveRequest = CNSaveRequest()
+//
+//        if let storedContact = friend.storedContact,
+//           let phoneNumberToEdit = storedContact.phoneNumbers.first(where: { $0 == friend.phoneNumberField }),
+//           let index = storedContact.phoneNumbers.firstIndex(of: phoneNumberToEdit) {
+//
+//            let newPhoneNumberField = phoneNumberToEdit.settingValue(phoneNumberValue)
+//            storedContact.phoneNumbers.remove(at: index)
+//            storedContact.phoneNumbers.insert(newPhoneNumberField, at: index)
+//            friend.phoneNumberField = newPhoneNumberField
+//
+//            saveRequest.update(storedContact)
+//            friend.storedContact = nil
+//
+//        } else if let unsavedContact = friend.contactValue.mutableCopy() as? CNMutableContact {
+//
+//            let phoneNumberField = CNLabeledValue(label: CNLabelPhoneNumberMain,
+//                                                  value: phoneNumberValue)
+//            unsavedContact.phoneNumbers = [phoneNumberField]
+//            friend.phoneNumberField = phoneNumberField
+//
+//            saveRequest.add(unsavedContact, toContainerWithIdentifier: nil)
+//        }
+//
+//        do {
+//            try store.execute(saveRequest)
+//            resolve
+//        } catch {
+//            print(error)
+//            failure
+//        }
+    }
+    
+    public override func checkPermissions(_ call: CAPPluginCall) {
+        let contactsState: String
+        
+        switch CNContactStore.authorizationStatus(for: .contacts) {
+        case .notDetermined:
+            contactsState = "prompt"
+        case .restricted, .denied:
+            contactsState = "denied"
+        case .authorized:
+            contactsState = "granted"
+        @unknown default:
+            contactsState = "prompt"
+        }
+        
+        call.resolve(["contacts": contactsState])
+    }
+    
+    public override func requestPermissions(_ call: CAPPluginCall) {
+        CNContactStore().requestAccess(for: .contacts) { [weak self] _, _ in
+            self?.checkPermissions(call)
+        }
+    }
+}
+
+extension ContactsPlugin: CNContactViewControllerDelegate {
+    
+    // Dismiss the popover when adding the contact is done
+    public func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
+        guard let bridge = self.bridge else { return }
+
+        bridge.viewController?.dismiss(animated: true, completion: nil)
+
+        if let contact = contact {
+            self.call?.resolve([
+                "succes": "This is succesful!"
+            ])
+        } else {
+            self.call?.reject("Cancelled adding contact")
+        }
+    }
+}
+
+extension ContactsPlugin: CNContactPickerDelegate {
+
+    // The popover to pick a contact
+    public func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
+        let contactData = Contact(call: call!)
+        guard let existingContact = contact.mutableCopy() as? CNMutableContact else { return }
+        
+        existingContact.addPhoneNumbers(from: contactData)
+        existingContact.addEmailAdresses(from: contactData)
+        existingContact.addPostalAdresses(from: contactData)
+        
+        saveContact(existingContact, saveOption: .addToExisting)
+    }
+    
+    // Dismiss the popover when choosing the contact is canceled
+    public func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
+        guard let bridge = self.bridge else { return }
+
+        bridge.viewController?.dismiss(animated: true, completion: nil)
+        
+        // TODO: Add call.resolve
+        self.call?.reject("Cancelled contact picker")
     }
 }
