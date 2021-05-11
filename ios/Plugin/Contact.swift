@@ -21,6 +21,8 @@ struct Contact {
 
     var note: String?
 
+    var groupName: String?
+
     var phoneNumberLabels: [String]
     var phoneNumbers: [String]
 
@@ -63,6 +65,8 @@ struct Contact {
         nickname = call.getString("nickname")
         
         note = call.getString("note")
+
+        groupName = call.getString("groupName")
         
         phoneNumberLabels = call.getArray("phoneNumberLabels", String.self) ?? []
         phoneNumbers = call.getArray("phoneNumbers", String.self) ?? []

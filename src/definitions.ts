@@ -23,6 +23,7 @@ export interface Contact {
   /**
    * The name at which to open the map.
    */
+  displayName: string | null;
   namePrefix: string | null;
   givenName: string | null;
   middleName: string | null;
@@ -32,6 +33,8 @@ export interface Contact {
   nickname: string | null;
   
   note: string | null;
+
+  groupName: string | null;
 
   phoneNumberLabels: [string];
   phoneNumbers: [string];

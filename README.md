@@ -103,7 +103,8 @@ requestPermissions() => Promise<PermissionStatus>
 
 | Prop                     | Type                                  | Description                        |
 | ------------------------ | ------------------------------------- | ---------------------------------- |
-| **`namePrefix`**         | <code>string \| null</code>           | The name at which to open the map. |
+| **`displayName`**        | <code>string \| null</code>           | The name at which to open the map. |
+| **`namePrefix`**         | <code>string \| null</code>           |                                    |
 | **`givenName`**          | <code>string \| null</code>           |                                    |
 | **`middleName`**         | <code>string \| null</code>           |                                    |
 | **`familyName`**         | <code>string \| null</code>           |                                    |
@@ -111,6 +112,7 @@ requestPermissions() => Promise<PermissionStatus>
 | **`nameSuffix`**         | <code>string \| null</code>           |                                    |
 | **`nickname`**           | <code>string \| null</code>           |                                    |
 | **`note`**               | <code>string \| null</code>           |                                    |
+| **`groupName`**          | <code>string \| null</code>           |                                    |
 | **`phoneNumberLabels`**  | <code>[string]</code>                 |                                    |
 | **`phoneNumbers`**       | <code>[string]</code>                 |                                    |
 | **`emailLabels`**        | <code>[string]</code>                 |                                    |

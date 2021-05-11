@@ -13,6 +13,9 @@ public class ContactsPlugin: CAPPlugin {
     private var call: CAPPluginCall?
     private var store = CNContactStore()
     
+    private var manager: ContactManager?
+    private var contactData: Contact?
+    
     /*
      * More: https://www.youtube.com/watch?v=5kBtuQAFuGk
      */
@@ -32,42 +35,48 @@ public class ContactsPlugin: CAPPlugin {
     @objc func createNew(_ call: CAPPluginCall) {
         self.call = call
         
-        let contactData = Contact(call: call)
+        // Get contactData from call
+        contactData = Contact(call: call)
+
+        // Create new contact and ContactManager
         let newContact = CNMutableContact()
-        
-        newContact.setNameFields(from: contactData)
-        
-        newContact.setNote(from: contactData)
-        
-        // Add all the phone numbers
-        newContact.addPhoneNumbers(from: contactData)
-        
-        // Add all the email addresses
-        newContact.addEmailAdresses(from: contactData)
-        
-        // Set addresses
-        newContact.addPostalAdresses(from: contactData)
-        
-        // Add all the urls
-        newContact.addUrls(from: contactData)
-        
-//        FIXME
-//        newContact.setBirthday(from: contactData)
-        
-        saveContact(newContact, saveOption: .createNew)
+        manager = ContactManager(contact: newContact);
+
+        saveContact(saveOption: .createNew)
     }
 
     /*
      * Save with contactVC: https://stackoverflow.com/questions/58749575/how-to-add-new-contact-into-contacts?noredirect=1&lq=1
      */
-    public func saveContact(_ contact: CNMutableContact, saveOption: ContactSaveOptions) {
+    public func saveContact(saveOption: ContactSaveOptions) {
+
+        if saveOption == .createNew {
+            manager?.setNameFields(from: contactData!)
+            
+            manager?.setNote(from: contactData!)
+
+            // TODO: add group
+        
+            // FIXME
+            // newContact.setBirthday(from: contactData)
+        }
+
+        // Add all the phone numbers
+        manager?.addPhoneNumbers(from: contactData!)
+        
+        // Add all the email addresses
+        manager?.addEmailAdresses(from: contactData!)
+        
+        // Set addresses
+        manager?.addPostalAdresses(from: contactData!)
+        
+        // Add all the urls
+        manager?.addUrls(from: contactData!)
+
+        // Create the VC for adding a contact
         let contactVC: CNContactViewController
-        
-        contactVC = CNContactViewController(forNewContact: contact)
-        
-        contactVC.delegate = self // this delegate CNContactViewControllerDelegate
-        // self.navigationController?.pushViewController(vc, animated: true)
-        // self.present(UINavigationController(rootViewController: vc), animated:true)
+        contactVC = CNContactViewController(forNewContact: manager?.contact)
+        contactVC.delegate = self
         
         DispatchQueue.main.async {
             guard let bridge = self.bridge else { return }
@@ -197,7 +206,7 @@ extension ContactsPlugin: CNContactViewControllerDelegate {
 
         bridge.viewController?.dismiss(animated: true, completion: nil)
 
-        if let contact = contact {
+        if contact != nil {
             self.call?.resolve([
                 "succes": "This is succesful!"
             ])
@@ -211,14 +220,13 @@ extension ContactsPlugin: CNContactPickerDelegate {
 
     // The popover to pick a contact
     public func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
-        let contactData = Contact(call: call!)
+        contactData = Contact(call: call!)
         guard let existingContact = contact.mutableCopy() as? CNMutableContact else { return }
         
-        existingContact.addPhoneNumbers(from: contactData)
-        existingContact.addEmailAdresses(from: contactData)
-        existingContact.addPostalAdresses(from: contactData)
+        // Create new ContactManager
+        manager = ContactManager(contact: existingContact);
         
-        saveContact(existingContact, saveOption: .addToExisting)
+        saveContact(saveOption: .addToExisting)
     }
     
     // Dismiss the popover when choosing the contact is canceled
