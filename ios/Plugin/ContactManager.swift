@@ -13,7 +13,7 @@ struct ContactManager {
         contact.givenName = contactData.givenName ?? ""
         contact.middleName = contactData.middleName ?? ""
         contact.familyName = contactData.familyName ?? ""
-        contact.previousFamilyName = contactData.previousFamilyName ?? ""
+//        contact.previousFamilyName = contactData.previousFamilyName ?? ""
         contact.nameSuffix = contactData.nameSuffix ?? ""
         contact.nickname = contactData.nickname ?? ""
     }
