@@ -5,8 +5,8 @@ export interface PermissionStatus {
 }
 
 export interface ContactsPlugin {
-  createNew(contact: Contact): Promise<{ success: string }>;
-  addToExisting(contact: Contact): Promise<{ success: string }>;
+  createNew(contact: Contact): Promise<{ savedContact: Contact }>;
+  addToExisting(contact: Contact): Promise<{ savedContact: Contact }>;
 
   /**
    * Gets contacts and returns the results.
@@ -15,6 +15,11 @@ export interface ContactsPlugin {
    */
   getContacts(filter: string): Promise<{ results: any[] }>;
 
+  /**
+   * Implements the Capacitor Permissions API.
+   *
+   * @since 1.1.0
+   */
   checkPermissions(): Promise<PermissionStatus>;
   requestPermissions(): Promise<PermissionStatus>;
 }

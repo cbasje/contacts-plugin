@@ -7,8 +7,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
-import com.getcapacitor.PluginCall;
-
 import java.util.List;
 
 public class ContactManager {
@@ -81,7 +79,7 @@ public class ContactManager {
         contentResolver.insert(ContactsContract.Data.CONTENT_URI, contentValues);
     }
 
-    void insertListData(Uri contentUri, long rawContactId, String mimeType, String dataTypeColumnName, String dataValueColumnName, List<ContactData> dataList) {
+    void insertListData(Uri contentUri, long rawContactId, String mimeType, String dataTypeColumnName, String dataValueColumnName, List<ContactListData> dataList) {
         if(dataList != null) {
             ContentValues contentValues = new ContentValues();
 
@@ -89,7 +87,7 @@ public class ContactManager {
 
             for(int i=0; i<size; i++) {
 
-                ContactData contactData = dataList.get(i);
+                ContactListData contactListData = dataList.get(i);
 
                 contentValues.clear();
 
@@ -98,9 +96,9 @@ public class ContactManager {
                 // Set data mimetype.
                 contentValues.put(ContactsContract.Data.MIMETYPE, mimeType);
                 // Set data type.
-                contentValues.put(dataTypeColumnName, contactData.getDataType());
+                contentValues.put(dataTypeColumnName, contactListData.getDataType());
                 // Set data value.
-                contentValues.put(dataValueColumnName, contactData.getDataValue());
+                contentValues.put(dataValueColumnName, contactListData.getDataValue());
 
                 contentResolver.insert(contentUri, contentValues);
             }

@@ -1,6 +1,6 @@
 package nl.csrdelft.plugins.contacts;
 
-public class ContactData {
+public class ContactListData {
     private int dataType;
 
     private String dataValue;

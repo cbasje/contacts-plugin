@@ -3,13 +3,13 @@ import { WebPlugin } from '@capacitor/core';
 import { Contact, ContactsPlugin, PermissionStatus } from './definitions';
 
 export class ContactsWeb extends WebPlugin implements ContactsPlugin {
-  createNew(contact: Contact): Promise<{ success: string }> {
-    // FIXME
-    throw new Error('Method not implemented.');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  createNew(contact: Contact): Promise<{ savedContact: Contact }> {
+    throw this.unimplemented('Not implemented on web.');
   }
-  addToExisting(contact: Contact): Promise<{ success: string }> {
-    // FIXME
-    throw new Error('Method not implemented.');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  addToExisting(contact: Contact): Promise<{ savedContact: Contact }> {
+    throw this.unimplemented('Not implemented on web.');
   }
 
   async getContacts(filter: string): Promise<{ results: any[] }> {

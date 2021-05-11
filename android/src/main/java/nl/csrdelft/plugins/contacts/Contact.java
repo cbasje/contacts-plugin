@@ -1,20 +1,19 @@
 package nl.csrdelft.plugins.contacts;
 
 import android.provider.ContactsContract;
-
 import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-
-import org.json.JSONException;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import org.json.JSONException;
 
 public class Contact {
+
     private long contactId;
     private long rawContactId;
     private long groupId;
@@ -51,16 +50,18 @@ public class Contact {
     private Date birthday;
 
     // Contact phone list.
-    private List<ContactData> phoneList = new ArrayList<ContactData>();
+    private List<ContactListData> phoneList = new ArrayList<ContactListData>();
 
     // Contact email list
-    private List<ContactData> emailList = new ArrayList<ContactData>();
+    private List<ContactListData> emailList = new ArrayList<ContactListData>();
 
     // Contact address list.
-    private List<ContactData> addressList = new ArrayList<ContactData>();
+    private List<ContactListData> addressList = new ArrayList<ContactListData>();
 
     // Contact website list.
-    private List<ContactData> websiteList = new ArrayList<ContactData>();
+    private List<ContactListData> websiteList = new ArrayList<ContactListData>();
+
+    private JSObject jsonResponse;
 
     Contact(PluginCall call) {
         displayName = call.getString("displayName");
@@ -78,7 +79,7 @@ public class Contact {
         phoneNumbers = call.getArray("phoneNumbers");
 
         // Create mobile phone
-        ContactData mobilePhone = new ContactData();
+        ContactListData mobilePhone = new ContactListData();
         mobilePhone.setDataType(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
         try {
             mobilePhone.setDataValue(phoneNumbers.getString(0));
@@ -91,7 +92,7 @@ public class Contact {
         emails = call.getArray("emails");
 
         // Create home email
-        ContactData homeEmailDto = new ContactData();
+        ContactListData homeEmailDto = new ContactListData();
         homeEmailDto.setDataType(ContactsContract.CommonDataKinds.Email.TYPE_HOME);
         try {
             homeEmailDto.setDataValue(emails.getString(0));
@@ -108,7 +109,7 @@ public class Contact {
         country = call.getString("country");
 
         // Create home address
-        ContactData homeAddressDto = new ContactData();
+        ContactListData homeAddressDto = new ContactListData();
         homeAddressDto.setDataType(ContactsContract.CommonDataKinds.SipAddress.TYPE_HOME);
         homeAddressDto.setDataValue(street);
         addressList.add(homeAddressDto);
@@ -117,7 +118,7 @@ public class Contact {
         urls = call.getArray("urls");
 
         // Create profile website
-        ContactData profileWebsiteDto = new ContactData();
+        ContactListData profileWebsiteDto = new ContactListData();
         profileWebsiteDto.setDataType(ContactsContract.CommonDataKinds.Website.TYPE_PROFILE);
         try {
             profileWebsiteDto.setDataValue(urls.getString(0));
@@ -127,6 +128,8 @@ public class Contact {
         websiteList.add(profileWebsiteDto);
 
         birthday = setBirthday(call.getString("birthday"));
+
+        jsonResponse = call.getData();
     }
 
     private Date setBirthday(String dateString) {
@@ -228,23 +231,27 @@ public class Contact {
         return birthday;
     }
 
+    public JSObject getJsonResponse() {
+        return jsonResponse;
+    }
+
     public String getGroupName() {
         return groupName;
     }
 
-    public List<ContactData> getPhoneList() {
+    public List<ContactListData> getPhoneList() {
         return phoneList;
     }
 
-    public List<ContactData> getEmailList() {
+    public List<ContactListData> getEmailList() {
         return emailList;
     }
 
-    public List<ContactData> getAddressList() {
+    public List<ContactListData> getAddressList() {
         return addressList;
     }
 
-    public List<ContactData> getWebsiteList() {
+    public List<ContactListData> getWebsiteList() {
         return websiteList;
     }
 

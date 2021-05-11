@@ -85,6 +85,9 @@ public class ContactsPlugin: CAPPlugin {
         }
     }
     
+    /*
+     * From https://devdactic.com/build-capacitor-plugin/ but adapted to Capacitor V3
+     */
     @objc func getContacts(_ call: CAPPluginCall) {
         addToExisting(call)
         
@@ -208,7 +211,7 @@ extension ContactsPlugin: CNContactViewControllerDelegate {
 
         if contact != nil {
             self.call?.resolve([
-                "succes": "This is succesful!"
+                "savedContact": contactData!.jsonResponse
             ])
         } else {
             self.call?.reject("Cancelled adding contact")

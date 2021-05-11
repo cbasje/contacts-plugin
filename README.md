@@ -28,14 +28,14 @@ npx cap sync
 ### createNew(...)
 
 ```typescript
-createNew(contact: Contact) => Promise<{ success: string; }>
+createNew(contact: Contact) => Promise<{ savedContact: Contact; }>
 ```
 
 | Param         | Type                                        |
 | ------------- | ------------------------------------------- |
 | **`contact`** | <code><a href="#contact">Contact</a></code> |
 
-**Returns:** <code>Promise&lt;{ success: string; }&gt;</code>
+**Returns:** <code>Promise&lt;{ savedContact: <a href="#contact">Contact</a>; }&gt;</code>
 
 --------------------
 
@@ -43,14 +43,14 @@ createNew(contact: Contact) => Promise<{ success: string; }>
 ### addToExisting(...)
 
 ```typescript
-addToExisting(contact: Contact) => Promise<{ success: string; }>
+addToExisting(contact: Contact) => Promise<{ savedContact: Contact; }>
 ```
 
 | Param         | Type                                        |
 | ------------- | ------------------------------------------- |
 | **`contact`** | <code><a href="#contact">Contact</a></code> |
 
-**Returns:** <code>Promise&lt;{ success: string; }&gt;</code>
+**Returns:** <code>Promise&lt;{ savedContact: <a href="#contact">Contact</a>; }&gt;</code>
 
 --------------------
 

@@ -7,9 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
-
 import androidx.activity.result.ActivityResult;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
@@ -29,10 +27,12 @@ import org.json.JSONArray;
     permissions = { @Permission(alias = "contacts", strings = { Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS }) }
 )
 public class ContactsPlugin extends Plugin {
+
     private PluginCall call;
     private ContactManager manager;
     private Contact contactData;
 
+    // From https://devdactic.com/build-capacitor-plugin/ but adapted to Capacitor V3
     @PluginMethod
     public void getContacts(PluginCall call) {
         if (getPermissionState("contacts") != PermissionState.GRANTED) {
@@ -103,8 +103,7 @@ public class ContactsPlugin extends Plugin {
         // Get contactData from call
         contactData = new Contact(call);
 
-        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI);
+        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         startActivityForResult(call, contactPickerIntent, "processPickedContact");
     }
 
@@ -125,8 +124,6 @@ public class ContactsPlugin extends Plugin {
         // Contact id and raw contact id has same value.
         contactData.setContactId(rawContactId);
         contactData.setRawContactId(rawContactId);
-
-        Log.d("DEBUG_ID", "Got a result: " + rawContactId);
 
         saveContact(ContactSaveOptions.CREATE_NEW);
     }
@@ -161,35 +158,41 @@ public class ContactsPlugin extends Plugin {
 
         /* Insert contact email list data, Content uri do not use ContactsContract.CommonDataKinds.Email.CONTENT_URI
          * Otherwise it will throw error java.lang.UnsupportedOperationException: URI: content://com.android.contacts/data/emails */
-        manager.insertListData(ContactsContract.Data.CONTENT_URI,
-                contactData.getRawContactId(),
-                ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
-                ContactsContract.CommonDataKinds.Email.TYPE,
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                contactData.getEmailList());
+        manager.insertListData(
+            ContactsContract.Data.CONTENT_URI,
+            contactData.getRawContactId(),
+            ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
+            ContactsContract.CommonDataKinds.Email.TYPE,
+            ContactsContract.CommonDataKinds.Email.ADDRESS,
+            contactData.getEmailList()
+        );
 
         /* Insert contact phone list data, Content uri do not use ContactsContract.CommonDataKinds.Phone.CONTENT_URI
          * Otherwise it will throw error java.lang.UnsupportedOperationException: URI: content://com.android.contacts/data/phones */
-        manager.insertListData(ContactsContract.Data.CONTENT_URI,
-                contactData.getRawContactId(),
-                ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-                ContactsContract.CommonDataKinds.Phone.TYPE,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-                contactData.getPhoneList());
+        manager.insertListData(
+            ContactsContract.Data.CONTENT_URI,
+            contactData.getRawContactId(),
+            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+            ContactsContract.CommonDataKinds.Phone.TYPE,
+            ContactsContract.CommonDataKinds.Phone.NUMBER,
+            contactData.getPhoneList()
+        );
 
         // Insert contact website list.
-        manager.insertListData(ContactsContract.Data.CONTENT_URI,
-                contactData.getRawContactId(),
-                ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE,
-                ContactsContract.CommonDataKinds.Website.TYPE,
-                ContactsContract.CommonDataKinds.Website.URL,
-                contactData.getWebsiteList());
+        manager.insertListData(
+            ContactsContract.Data.CONTENT_URI,
+            contactData.getRawContactId(),
+            ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE,
+            ContactsContract.CommonDataKinds.Website.TYPE,
+            ContactsContract.CommonDataKinds.Website.URL,
+            contactData.getWebsiteList()
+        );
 
         // Insert contact post address
         manager.insertPostalAddress(contactData);
 
         JSObject callData = new JSObject();
-        callData.put("succes", "This is succesful!");
+        callData.put("savedContact", contactData.getJsonResponse());
         call.resolve(callData);
     }
 
@@ -209,8 +212,6 @@ public class ContactsPlugin extends Plugin {
         // Contact id and raw contact id has same value.
         contactData.setContactId(rawContactId);
         contactData.setRawContactId(rawContactId);
-
-        Log.d("DEBUG_ID", "Got a result: " + rawContactId);
 
         // First get contentresolver object.
         ContentResolver contentResolver = getContext().getContentResolver();

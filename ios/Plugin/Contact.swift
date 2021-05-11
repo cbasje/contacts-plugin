@@ -41,6 +41,8 @@ struct Contact {
 
     var birthday: Date
     
+    var jsonResponse: JSObject
+    
     var birthdayComps: DateComponents {
         let dc = Calendar.current.dateComponents(
             [.day, .month, .year],
@@ -85,6 +87,8 @@ struct Contact {
         urls = call.getArray("urls", String.self) ?? []
         
         birthday = call.getDate("birthday") ?? Date()
+        
+        jsonResponse = call.jsObjectRepresentation
     }
 }
 //extension Contact: Codable {
