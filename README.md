@@ -31,6 +31,8 @@ npx cap sync
 createNew(contact: Contact) => Promise<{ savedContact: Contact; }>
 ```
 
+Creates a new contact and saves it, returning the saved contact's data.
+
 | Param         | Type                                        |
 | ------------- | ------------------------------------------- |
 | **`contact`** | <code><a href="#contact">Contact</a></code> |
@@ -45,6 +47,8 @@ createNew(contact: Contact) => Promise<{ savedContact: Contact; }>
 ```typescript
 addToExisting(contact: Contact) => Promise<{ savedContact: Contact; }>
 ```
+
+Allows the user to pick a contact and adds the data to it, returning the saved contact's data.
 
 | Param         | Type                                        |
 | ------------- | ------------------------------------------- |
@@ -61,7 +65,7 @@ addToExisting(contact: Contact) => Promise<{ savedContact: Contact; }>
 getContacts(filter: string) => Promise<{ results: any[]; }>
 ```
 
-Gets contacts and returns the results.
+Gets contacts and returns the results. From https://devdactic.com/build-capacitor-plugin/ but adapted to Capacitor V3
 
 | Param        | Type                |
 | ------------ | ------------------- |
@@ -80,7 +84,11 @@ Gets contacts and returns the results.
 checkPermissions() => Promise<PermissionStatus>
 ```
 
+Implements the Capacitor Permissions API.
+
 **Returns:** <code>Promise&lt;<a href="#permissionstatus">PermissionStatus</a>&gt;</code>
+
+**Since:** 1.1.0
 
 --------------------
 
@@ -101,31 +109,30 @@ requestPermissions() => Promise<PermissionStatus>
 
 #### Contact
 
-| Prop                     | Type                                  | Description                        |
-| ------------------------ | ------------------------------------- | ---------------------------------- |
-| **`displayName`**        | <code>string \| null</code>           | The name at which to open the map. |
-| **`namePrefix`**         | <code>string \| null</code>           |                                    |
-| **`givenName`**          | <code>string \| null</code>           |                                    |
-| **`middleName`**         | <code>string \| null</code>           |                                    |
-| **`familyName`**         | <code>string \| null</code>           |                                    |
-| **`previousFamilyName`** | <code>string \| null</code>           |                                    |
-| **`nameSuffix`**         | <code>string \| null</code>           |                                    |
-| **`nickname`**           | <code>string \| null</code>           |                                    |
-| **`note`**               | <code>string \| null</code>           |                                    |
-| **`groupName`**          | <code>string \| null</code>           |                                    |
-| **`phoneNumberLabels`**  | <code>[string]</code>                 |                                    |
-| **`phoneNumbers`**       | <code>[string]</code>                 |                                    |
-| **`emailLabels`**        | <code>[string]</code>                 |                                    |
-| **`emails`**             | <code>[string]</code>                 |                                    |
-| **`addressLabel`**       | <code>string \| null</code>           |                                    |
-| **`street`**             | <code>string \| null</code>           |                                    |
-| **`city`**               | <code>string \| null</code>           |                                    |
-| **`state`**              | <code>string \| null</code>           |                                    |
-| **`postalCode`**         | <code>string \| null</code>           |                                    |
-| **`country`**            | <code>string \| null</code>           |                                    |
-| **`urlLabels`**          | <code>[] \| [string]</code>           |                                    |
-| **`urls`**               | <code>[] \| [string]</code>           |                                    |
-| **`birthday`**           | <code><a href="#date">Date</a></code> |                                    |
+| Prop                    | Type                                  | Description                                   |
+| ----------------------- | ------------------------------------- | --------------------------------------------- |
+| **`displayName`**       | <code>string \| null</code>           | The full name of the contact                  |
+| **`namePrefix`**        | <code>string \| null</code>           | The prefix for the name of the contact        |
+| **`givenName`**         | <code>string \| null</code>           | The given name of the contact                 |
+| **`middleName`**        | <code>string \| null</code>           | The middle name of the contact                |
+| **`familyName`**        | <code>string \| null</code>           | The family name of the contact                |
+| **`nameSuffix`**        | <code>string \| null</code>           | The suffix for the name of the contact        |
+| **`nickname`**          | <code>string \| null</code>           | The nickname of the contact                   |
+| **`note`**              | <code>string \| null</code>           | A note for the contact                        |
+| **`groupName`**         | <code>string \| null</code>           | The name of the group the contact is added to |
+| **`phoneNumberLabels`** | <code>[string]</code>                 | The labels of the phone numbers               |
+| **`phoneNumbers`**      | <code>[string]</code>                 | The phone numbers                             |
+| **`emailLabels`**       | <code>[string]</code>                 | The labels of the email addresses             |
+| **`emails`**            | <code>[string]</code>                 | The email addresses                           |
+| **`addressLabel`**      | <code>string \| null</code>           | The label of the postal address               |
+| **`street`**            | <code>string \| null</code>           | The street of the postal address              |
+| **`city`**              | <code>string \| null</code>           | The city of the postal address                |
+| **`state`**             | <code>string \| null</code>           | The state of the postal address               |
+| **`postalCode`**        | <code>string \| null</code>           | The postal code of the postal address         |
+| **`country`**           | <code>string \| null</code>           | The country of the postal address             |
+| **`urlLabels`**         | <code>[] \| [string]</code>           | The labels of the URLs                        |
+| **`urls`**              | <code>[] \| [string]</code>           | The URLs                                      |
+| **`birthday`**          | <code><a href="#date">Date</a></code> | The birthday of the contact                   |
 
 
 #### Date

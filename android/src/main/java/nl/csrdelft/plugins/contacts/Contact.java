@@ -23,7 +23,6 @@ public class Contact {
     private String givenName;
     private String middleName;
     private String familyName;
-    private String previousFamilyName;
     private String nameSuffix;
     private String nickname;
 
@@ -69,7 +68,7 @@ public class Contact {
         givenName = call.getString("givenName");
         middleName = call.getString("middleName");
         familyName = call.getString("familyName");
-        previousFamilyName = call.getString("previousFamilyName");
+        // previousFamilyName = call.getString("previousFamilyName");
         nameSuffix = call.getString("nameSuffix");
         nickname = call.getString("nickname");
 
@@ -161,10 +160,6 @@ public class Contact {
 
     public String getFamilyName() {
         return familyName;
-    }
-
-    public String getPreviousFamilyName() {
-        return previousFamilyName;
     }
 
     public String getNameSuffix() {

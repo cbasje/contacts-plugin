@@ -15,7 +15,6 @@ struct Contact {
     var givenName: String?
     var middleName: String?
     var familyName: String?
-    var previousFamilyName: String?
     var nameSuffix: String?
     var nickname: String?
 
@@ -62,7 +61,7 @@ struct Contact {
         givenName = call.getString("givenName")
         middleName = call.getString("middleName")
         familyName = call.getString("familyName")
-        previousFamilyName = call.getString("previousFamilyName")
+        // previousFamilyName = call.getString("previousFamilyName")
         nameSuffix = call.getString("nameSuffix")
         nickname = call.getString("nickname")
         
